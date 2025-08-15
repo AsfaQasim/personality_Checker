@@ -4,25 +4,18 @@ import os
 import requests
 from utils import analyze_personality, get_zodiac_sign
 
-# ------------------------------
-# Local development only: load .env
-# ------------------------------
+
 if os.environ.get("LOCAL_DEV", "true") == "true":
     from dotenv import load_dotenv
     load_dotenv()
 
-# ------------------------------
-# Page config
-# ------------------------------
 st.set_page_config(
     page_title="🔮 AstroPersona",
     page_icon="🔮",
     layout="centered"
 )
 
-# ------------------------------
-# Dark theme CSS
-# ------------------------------
+
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
