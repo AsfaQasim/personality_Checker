@@ -5,7 +5,9 @@ import requests
 from dotenv import load_dotenv
 from utils import analyze_personality, get_zodiac_sign
 
-# Load environment variables
+
+#  varibale
+
 load_dotenv()
 
 # Page config
