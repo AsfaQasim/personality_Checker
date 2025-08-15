@@ -2,13 +2,12 @@ import streamlit as st
 from datetime import datetime
 import os
 import requests
+from utils import analyze_personality, get_zodiac_sign
 
-# Local development: load .env
-if os.environ.get("LOCAL_DEV", "true") == "true":
+# Local development: load .env only if LOCAL_DEV=true
+if os.environ.get("LOCAL_DEV", "false") == "true":
     from dotenv import load_dotenv
     load_dotenv()
-
-from utils import analyze_personality, get_zodiac_sign
 
 # Page config
 st.set_page_config(
@@ -98,7 +97,7 @@ if st.button("🔍 Analyze Personality", use_container_width=True):
     st.write(result)
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # WhatsApp API
+    # WhatsApp API credentials
     instance_id = os.getenv("ULTRAMSG_INSTANCE_ID")
     api_token = os.getenv("ULTRAMSG_API_TOKEN")
     api_url = os.getenv("ULTRAMSG_API_URL")
