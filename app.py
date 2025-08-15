@@ -4,19 +4,25 @@ import os
 import requests
 from utils import analyze_personality, get_zodiac_sign
 
-# Local development: load .env only if LOCAL_DEV=true
-if os.environ.get("LOCAL_DEV", "false") == "true":
+# ------------------------------
+# Local development only: load .env
+# ------------------------------
+if os.environ.get("LOCAL_DEV", "true") == "true":
     from dotenv import load_dotenv
     load_dotenv()
 
+# ------------------------------
 # Page config
+# ------------------------------
 st.set_page_config(
     page_title="🔮 AstroPersona",
     page_icon="🔮",
     layout="centered"
 )
 
+# ------------------------------
 # Dark theme CSS
+# ------------------------------
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
@@ -60,11 +66,15 @@ h1 {
 </style>
 """, unsafe_allow_html=True)
 
+# ------------------------------
 # Title
+# ------------------------------
 st.markdown("<h1>🔮 AstroPersona</h1>", unsafe_allow_html=True)
 st.markdown("Discover your personality based on astrology and your favorites!")
 
+# ------------------------------
 # Input card
+# ------------------------------
 st.markdown('<div class="card">', unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 
@@ -82,7 +92,9 @@ with col2:
 
 st.markdown('</div>', unsafe_allow_html=True)
 
+# ------------------------------
 # Analyze button
+# ------------------------------
 if st.button("🔍 Analyze Personality", use_container_width=True):
     if not name:
         st.warning("Please enter your name")
@@ -91,17 +103,21 @@ if st.button("🔍 Analyze Personality", use_container_width=True):
     zodiac = get_zodiac_sign(dob.day, dob.month)
     result = analyze_personality(zodiac, hobby, dish, color, letter)
     
-    # Display analysis result
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader(f"🌟 Hello {name}, here is your personality:")
     st.write(result)
     st.markdown('</div>', unsafe_allow_html=True)
     
+    # ------------------------------
     # WhatsApp API credentials
+    # ------------------------------
     instance_id = os.getenv("ULTRAMSG_INSTANCE_ID")
-    api_token = os.getenv("ULTRAMSG_API_TOKEN")
-    api_url = os.getenv("ULTRAMSG_API_URL")
-    my_number = os.getenv("ULTRAMSG_MY_NUMBER")
+    api_token   = os.getenv("ULTRAMSG_API_TOKEN")
+    api_url     = os.getenv("ULTRAMSG_API_URL")
+    my_number   = os.getenv("ULTRAMSG_MY_NUMBER")
+    
+    # Debug (temporary) - check if credentials loaded
+    # st.write(instance_id, api_token, api_url, my_number)
     
     if instance_id and api_token and api_url and my_number:
         url = f"{api_url}/messages/chat"
@@ -127,4 +143,4 @@ if st.button("🔍 Analyze Personality", use_container_width=True):
         except Exception as e:
             st.error(f"🚨 Error sending message: {e}")
     else:
-        st.warning("WhatsApp API credentials are missing. Check Secrets or .env file.")
+        st.warning("WhatsApp API credentials are missing. Check Streamlit Secrets or local .env file.")
