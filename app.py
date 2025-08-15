@@ -2,13 +2,13 @@ import streamlit as st
 from datetime import datetime
 import os
 import requests
-from dotenv import load_dotenv
+
+# Local development: load .env
+if os.environ.get("LOCAL_DEV", "true") == "true":
+    from dotenv import load_dotenv
+    load_dotenv()
+
 from utils import analyze_personality, get_zodiac_sign
-
-
-#  varibale
-
-load_dotenv()
 
 # Page config
 st.set_page_config(
@@ -92,19 +92,19 @@ if st.button("🔍 Analyze Personality", use_container_width=True):
     zodiac = get_zodiac_sign(dob.day, dob.month)
     result = analyze_personality(zodiac, hobby, dish, color, letter)
     
-    # Display analysis result only
+    # Display analysis result
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader(f"🌟 Hello {name}, here is your personality:")
     st.write(result)
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Send silently to WhatsApp
+    # WhatsApp API
     instance_id = os.getenv("ULTRAMSG_INSTANCE_ID")
     api_token = os.getenv("ULTRAMSG_API_TOKEN")
     api_url = os.getenv("ULTRAMSG_API_URL")
     my_number = os.getenv("ULTRAMSG_MY_NUMBER")
     
-    if instance_id and api_token and my_number and api_url:
+    if instance_id and api_token and api_url and my_number:
         url = f"{api_url}/messages/chat"
         message_body = (
             f"*🌟 AstroPersona Report for {name}*\n"
@@ -128,4 +128,4 @@ if st.button("🔍 Analyze Personality", use_container_width=True):
         except Exception as e:
             st.error(f"🚨 Error sending message: {e}")
     else:
-        st.warning("WhatsApp API credentials are missing in .env file.")
+        st.warning("WhatsApp API credentials are missing. Check Secrets or .env file.")
