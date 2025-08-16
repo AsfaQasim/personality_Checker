@@ -1,21 +1,28 @@
 import streamlit as st
-from datetime import datetime
+from datetime import datetime, date
 import os
 import requests
 from utils import analyze_personality, get_zodiac_sign
 
-
+# ------------------------------
+# Local env for dev
+# ------------------------------
 if os.environ.get("LOCAL_DEV", "true") == "true":
     from dotenv import load_dotenv
     load_dotenv()
 
+# ------------------------------
+# Page Config
+# ------------------------------
 st.set_page_config(
     page_title="🔮 AstroPersona",
     page_icon="🔮",
     layout="centered"
 )
 
-
+# ------------------------------
+# Custom CSS
+# ------------------------------
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
@@ -56,6 +63,30 @@ h1 {
     -webkit-text-fill-color: transparent;
     margin-bottom: 30px;
 }
+
+/* Date input box */
+.stDateInput input {
+    color: black !important;
+    font-weight: 600 !important;
+    background: white !important;
+    border-radius: 8px !important;
+    padding: 6px !important;
+}/* ✅ Force every text in datepicker to be pure black */
+div[role="dialog"] .react-datepicker,
+div[role="dialog"] .react-datepicker * {
+    color: #000000 !important;   /* Pure black */
+}
+
+/* ✅ Specific date styles */
+div[role="dialog"] .react-datepicker__day,
+div[role="dialog"] .react-datepicker__day-name,
+div[role="dialog"] .react-datepicker__current-month,
+div[role="dialog"] .react-datepicker__day--outside-month {
+    color: #000000 !important;   /* Force black */
+    font-weight: 600 !important;
+}
+
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -75,7 +106,11 @@ with col1:
     name = st.text_input("✨ Your Name")
     father_name = st.text_input("👨‍🦳 Father's Name")
     mother_name = st.text_input("👩‍🦰 Mother's Name")
-    dob = st.date_input("🎂 Date of Birth")
+    dob = st.date_input(
+        "🎂 Date of Birth",
+        min_value=date(1980, 1, 1),
+        max_value=date(2025, 12, 31)
+    )
 
 with col2:
     hobby = st.text_input("⚽ Favourite Hobby")
@@ -89,29 +124,39 @@ st.markdown('</div>', unsafe_allow_html=True)
 # Analyze button
 # ------------------------------
 if st.button("🔍 Analyze Personality", use_container_width=True):
-    if not name:
-        st.warning("Please enter your name")
+    # Validate required fields
+    if not all([name, father_name, mother_name, hobby, dish, color, letter, dob]):
+        st.warning("⚠️ Please fill in all fields before proceeding!")
         st.stop()
-    
+
+    # Validate DOB year (1999–2025)
+    if dob.year < 1999 or dob.year > 2025:
+        st.error("⚠️ Date of Birth must be between 1999 and 2025!")
+        st.markdown(
+            f"<p style='color:black; font-weight:bold;'>❌ Invalid Date: {dob}</p>",
+            unsafe_allow_html=True
+        )
+        st.stop()
+
+    # ------------------------------
+    # Personality Analysis
+    # ------------------------------
     zodiac = get_zodiac_sign(dob.day, dob.month)
     result = analyze_personality(zodiac, hobby, dish, color, letter)
-    
+
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader(f"🌟 Hello {name}, here is your personality:")
     st.write(result)
     st.markdown('</div>', unsafe_allow_html=True)
-    
+
     # ------------------------------
-    # WhatsApp API credentials
+    # WhatsApp API
     # ------------------------------
     instance_id = os.getenv("ULTRAMSG_INSTANCE_ID")
     api_token   = os.getenv("ULTRAMSG_API_TOKEN")
     api_url     = os.getenv("ULTRAMSG_API_URL")
     my_number   = os.getenv("ULTRAMSG_MY_NUMBER")
-    
-    # Debug (temporary) - check if credentials loaded
-    # st.write(instance_id, api_token, api_url, my_number)
-    
+
     if instance_id and api_token and api_url and my_number:
         url = f"{api_url}/messages/chat"
         message_body = (
