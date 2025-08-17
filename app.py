@@ -4,6 +4,7 @@ import os
 import requests
 from utils import analyze_personality, get_zodiac_sign
 
+# .env
 
 if os.environ.get("LOCAL_DEV", "true") == "true":
     from dotenv import load_dotenv
