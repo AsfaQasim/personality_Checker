@@ -4,25 +4,18 @@ import os
 import requests
 from utils import analyze_personality, get_zodiac_sign
 
-# ------------------------------
-# Local env for dev
-# ------------------------------
+
 if os.environ.get("LOCAL_DEV", "true") == "true":
     from dotenv import load_dotenv
     load_dotenv()
 
-# ------------------------------
-# Page Config
-# ------------------------------
+
 st.set_page_config(
     page_title="🔮 AstroPersona",
     page_icon="🔮",
     layout="centered"
 )
 
-# ------------------------------
-# Custom CSS
-# ------------------------------
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
@@ -90,15 +83,11 @@ div[role="dialog"] .react-datepicker__day--outside-month {
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------------------
-# Title
-# ------------------------------
+
 st.markdown("<h1>🔮 AstroPersona</h1>", unsafe_allow_html=True)
 st.markdown("Discover your personality based on astrology and your favorites!")
 
-# ------------------------------
-# Input card
-# ------------------------------
+
 st.markdown('<div class="card">', unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 
@@ -120,16 +109,12 @@ with col2:
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ------------------------------
-# Analyze button
-# ------------------------------
 if st.button("🔍 Analyze Personality", use_container_width=True):
-    # Validate required fields
+ 
     if not all([name, father_name, mother_name, hobby, dish, color, letter, dob]):
         st.warning("⚠️ Please fill in all fields before proceeding!")
         st.stop()
 
-    # Validate DOB year (1999–2025)
     if dob.year < 1999 or dob.year > 2025:
         st.error("⚠️ Date of Birth must be between 1999 and 2025!")
         st.markdown(
@@ -138,9 +123,7 @@ if st.button("🔍 Analyze Personality", use_container_width=True):
         )
         st.stop()
 
-    # ------------------------------
-    # Personality Analysis
-    # ------------------------------
+    
     zodiac = get_zodiac_sign(dob.day, dob.month)
     result = analyze_personality(zodiac, hobby, dish, color, letter)
 
@@ -149,9 +132,7 @@ if st.button("🔍 Analyze Personality", use_container_width=True):
     st.write(result)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ------------------------------
-    # WhatsApp API
-    # ------------------------------
+  
     instance_id = os.getenv("ULTRAMSG_INSTANCE_ID")
     api_token   = os.getenv("ULTRAMSG_API_TOKEN")
     api_url     = os.getenv("ULTRAMSG_API_URL")
